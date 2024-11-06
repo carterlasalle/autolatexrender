@@ -1,7 +1,7 @@
     // ==UserScript==
     // @name         Auto LaTeX Renderer
     // @namespace    http://tampermonkey.net/
-    // @version      1.6
+    // @version      1.7
     // @description  Converts LaTeX on web pages into formatted math using MathJax
     // @match        *://*/*
     // @grant        none
@@ -44,15 +44,21 @@
         }
 
         // Function to scan the document and render LaTeX
-        function renderLatex() {
+        function renderLatex(root = document.body) {
             try {
                 if (window.MathJax && MathJax.typesetPromise) {
-                    MathJax.typesetPromise().catch(function (err) {
+                    MathJax.typesetPromise([root]).catch(function (err) {
                         console.error('MathJax typeset failed:', err);
+                    });
+
+                    root.querySelectorAll('*').forEach(elem => {
+                        if (elem.shadowRoot) {
+                            renderLatex(elem.shadowRoot);
+                        }
                     });
                 } else {
                     console.log('MathJax not loaded yet. Retrying in 500ms...');
-                    setTimeout(renderLatex, 500);
+                    setTimeout(() => renderLatex(root), 500);
                 }
             } catch (error) {
                 console.error('Error during LaTeX rendering:', error);
@@ -66,13 +72,29 @@
                 renderLatex();
 
                 // Observe the DOM for changes and render LaTeX
-                const observer = new MutationObserver(() => {
+                const observer = new MutationObserver((mutations) => {
                     // Throttle the renderLatex calls
                     if (observer.renderTimeout) clearTimeout(observer.renderTimeout);
-                    observer.renderTimeout = setTimeout(renderLatex, 300);
+                    observer.renderTimeout = setTimeout(() => {
+                        mutations.forEach(mutation => {
+                            if (mutation.addedNodes) {
+                                mutation.addedNodes.forEach(node => {
+                                    if (node.nodeType === Node.ELEMENT_NODE) {
+                                        renderLatex(node);
+                                    }
+                                });
+                            }
+                        });
+                    }, 300);
                 });
 
-                observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+                observer.observe(document.body, { childList: true, subtree: true });
+
+                document.querySelectorAll('*').forEach(elem => {
+                    if (elem.shadowRoot) {
+                        observer.observe(elem.shadowRoot, { childList: true, subtree: true });
+                    }
+                });
             });
         });
 
