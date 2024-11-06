@@ -37,3 +37,15 @@ If you would like to contribute to the development of AutoLaTeXRenderer, please 
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more information.
+
+## Tests
+
+To use the tests, follow these steps:
+
+1. Ensure you have Node.js and npm installed on your system.
+2. Clone the repository and navigate to the project directory.
+3. Install the necessary dependencies by running `npm install`.
+4. Run the tests using a test runner like Mocha or Jest. For example, you can run `npm test` if you have a test script defined in your `package.json` file.
+
+The tests will verify that the script works as expected and will catch potential issues early. They include unit tests for the `addMathJax` function to verify MathJax is loaded correctly and the `renderLatex` function to ensure LaTeX is rendered properly.
+
