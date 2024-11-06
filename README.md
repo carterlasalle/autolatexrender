@@ -48,3 +48,4 @@ To use the tests, follow these steps:
 4. Run the tests using a test runner like Mocha or Jest. For example, you can run `npm test` if you have a test script defined in your `package.json` file.
 
 The tests will verify that the script works as expected and will catch potential issues early. They include unit tests for the `addMathJax` function to verify MathJax is loaded correctly and the `renderLatex` function to ensure LaTeX is rendered properly.
+
